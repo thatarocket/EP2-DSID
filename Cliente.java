@@ -8,7 +8,7 @@ public class Cliente {
 
     static Scanner scanner = new Scanner(System.in);
     static ContextoAtual contextoAtual;
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) {
         try {
             contextoAtual = new ContextoAtual();
             conectar();
@@ -33,23 +33,15 @@ public class Cliente {
         System.out.println("INSIRA A OPCAO DESEJADA: ");
         int input = Integer.parseInt(scanner.nextLine());
 
-        switch(input) {
-            case 1:
-                conectar();
-                break;
-            case 2:
-                desconectar();
-                break;
-            case 3:
-                quit();
-                break;
-            case 4:
-                teste();
-                break;
-            default:
+        switch (input) {
+            case 1 -> conectar();
+            case 2 -> desconectar();
+            case 3 -> quit();
+            case 4 -> teste();
+            default -> {
                 System.out.println("Opcao invalida! Coloque uma opcao valida:");
                 selecionar();
-                break;
+            }
         }
     }
 
@@ -62,8 +54,7 @@ public class Cliente {
         int numPorta = Integer.parseInt(scanner.nextLine());
 
         String objName = "rmi://localhost:" + numPorta + "/" + nomeAgencia;
-        IAgencia agencia = (IAgencia) Naming.lookup(objName);
-        contextoAtual.agenciaAtual = agencia;
+        contextoAtual.agenciaAtual = (IAgencia) Naming.lookup(objName);
         contextoAtual.nomeAgencia = nomeAgencia;
         contextoAtual.portaAgencia = numPorta;
         System.out.println("Conectado com sucesso!");
@@ -85,7 +76,7 @@ public class Cliente {
         System.exit(0);
     }
 
-    public static boolean estaConectado() {
+    private static boolean estaConectado() {
         return contextoAtual.agenciaAtual != null;
     }
 
