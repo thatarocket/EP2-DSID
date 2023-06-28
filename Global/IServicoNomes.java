@@ -17,4 +17,8 @@ public interface IServicoNomes extends Remote {
     int getAgencia(String idAgencia) throws RemoteException;
     String getAgente(String idAgente) throws RemoteException;
 
+    HashMap<String, Integer> getAgencias() throws RemoteException;
+
+    HashMap<String, String> getAgentes() throws RemoteException;
+
 }

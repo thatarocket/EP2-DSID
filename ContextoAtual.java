@@ -1,8 +1,13 @@
 import Global.IAgencia;
+import Global.IServicoNomes;
 
 public class ContextoAtual {
+
+    IServicoNomes servicoNomes;
+
+    int portaServico;
     IAgencia agenciaAtual;
-    String nomeAgencia;
+    String idAgencia;
     int portaAgencia;
 
 //    Agente agenteAtual;

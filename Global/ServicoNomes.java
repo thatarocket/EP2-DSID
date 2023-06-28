@@ -61,5 +61,14 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
                 return agentes.get(idAgente);
         }
 
+        @Override
+        public HashMap<String, Integer> getAgencias() throws RemoteException {
+                return agencias;
+        }
+
+        @Override
+        public HashMap<String, String> getAgentes() throws RemoteException {
+                return agentes;
+        }
 
 }
