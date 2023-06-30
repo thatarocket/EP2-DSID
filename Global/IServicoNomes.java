@@ -21,10 +21,10 @@ public interface IServicoNomes extends Remote {
 
     HashMap<String, String> getAgentes() throws RemoteException;
 
-    void removerAgente(String idAgente);
+    void removerAgente(String idAgente) throws RemoteException;
 
-    void moverAgente(String idAgente, String idAgenciaDestino);
+    void moverAgente(String idAgente, String idAgenciaDestino) throws RemoteException;
 
-    void removerAgencia(String idAgencia);
+    void removerAgencia(String idAgencia) throws RemoteException;
 
 }

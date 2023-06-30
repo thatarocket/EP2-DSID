@@ -12,12 +12,12 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
         HashMap<String, Integer> agencias = new HashMap<>(); // <idAgencia, numPorta>
         HashMap<String, String> agentes = new HashMap<>(); // <idAgente, idAgencia>
 
-        public ServicoNomes() throws Exception {
+        public ServicoNomes() throws RemoteException {
             super();
         }
 
         @Override
-        public String teste() {
+        public String teste() throws RemoteException {
             return "Teste";
         }
 
@@ -39,25 +39,25 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
                 return idAgente;
         }
 
-        public String gerarIdAgencia() {
+        public String gerarIdAgencia() throws RemoteException{
                 String id = "Agencia_" + qtdAgencias;
                 qtdAgencias++;
                 return id;
         }
 
-        public String gerarIdAgente() {
+        public String gerarIdAgente() throws RemoteException{
                 String id = "Agente_" + qtdAgentes;
                 qtdAgentes++;
                 return id;
         }
 
         //localizacao agencia
-        public int getAgencia(String idAgencia) {
+        public int getAgencia(String idAgencia) throws RemoteException {
                 return agencias.get(idAgencia);
         }
 
         //localizacao agente
-        public String getAgente(String idAgente) {
+        public String getAgente(String idAgente) throws RemoteException {
                 return agentes.get(idAgente);
         }
 
@@ -71,15 +71,15 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
                 return agentes;
         }
 
-        public void removerAgencia(String idAgencia) {
+        public void removerAgencia(String idAgencia) throws RemoteException {
                 agencias.remove(idAgencia);
         }
 
-        public void removerAgente(String idAgente) {
+        public void removerAgente(String idAgente) throws RemoteException {
                 agentes.remove(idAgente);
         }
 
-        public void moverAgente(String idAgente, String idAgenciaDestino) {
+        public void moverAgente(String idAgente, String idAgenciaDestino) throws RemoteException {
                 agentes.put(idAgente, idAgenciaDestino);
         }
 
