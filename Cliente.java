@@ -1,7 +1,13 @@
 
+import Global.Agente;
 import Global.IAgencia;
+import Global.IAgente;
 import Global.IServicoNomes;
 
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+import java.io.File;
+import java.nio.file.Files;
 import java.rmi.Naming;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -43,8 +49,9 @@ public class Cliente {
         System.out.println("--------------------------------------------------");
         System.out.println("Digite o nome da agencia a ser conectada: ");
         String nomeAgencia = scanner.nextLine();
-        System.out.println("Digite o numero da porta: ");
-        int numPorta = Integer.parseInt(scanner.nextLine());
+
+        HashMap<String,Integer> listaAgencias =  contextoAtual.servicoNomes.getAgencias();
+        int numPorta = listaAgencias.get(nomeAgencia);
 
         String objName = "rmi://localhost:" + numPorta + "/" + nomeAgencia;
         contextoAtual.agenciaAtual = (IAgencia) Naming.lookup(objName);
@@ -76,7 +83,9 @@ public class Cliente {
             case 2 -> desconectar();
             case 3 -> quit();
             case 4 -> teste();
-            case 5,6, 7 -> System.out.println("Ainda nao implementado");
+            case 5 -> criarAgente();
+            case 6 -> enviarMensagemAgente();
+            case 7 -> interromperExecucaoAgente();
             default -> {
                 System.out.println("Opcao invalida! Coloque uma opcao valida:");
                 opcoes();
@@ -84,8 +93,46 @@ public class Cliente {
         }
     }
 
-    public static void desconectar() throws Exception {
+    private static void criarAgente() throws Exception {
+        byte[] classBytes = compilarAgente();
+        // contextoAtual.agenciaAtual.adicionarAgente(classBytes);
+        System.out.println(classBytes);
+    }
+
+    private static byte[] compilarAgente() throws Exception {
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        int compilationResult = compiler.run(null, null, null, "Global/Agente.java");
+
+        if(compilationResult != 0) throw new Exception("Erro ao compilar o agente");
+        System.out.println("Agente compilado com sucesso!");
+
+        File file = new File("Global/Agente.class");
+        return Files.readAllBytes(file.toPath());
+    }
+
+    private static void enviarMensagemAgente() throws Exception {
         if(!estaConectado()) throw new Exception("Voce nao esta conectado a nenhuma agencia.");
+        System.out.println("--------------------------------------------------");
+        System.out.println("Digite o id do agente a ser interrompido: ");
+        String idAgente = scanner.nextLine();
+        System.out.println("Digite a mensagem a ser enviada: ");
+        String mensagem = scanner.nextLine();
+        contextoAtual.agenciaAtual.enviarMensagem(idAgente, mensagem);
+    }
+
+    private static void interromperExecucaoAgente() throws Exception {
+        if(!estaConectado()) throw new Exception("Voce nao esta conectado a nenhuma agencia.");
+        System.out.println("--------------------------------------------------");
+        System.out.println("Digite o id do agente a ser interrompido: ");
+        String idAgente = scanner.nextLine();
+        contextoAtual.agenciaAtual.removerAgente(idAgente);
+    }
+
+    private static void desconectar() throws Exception {
+        if(!estaConectado()) throw new Exception("Voce nao esta conectado a nenhuma agencia.");
+        String objName = "rmi://localhost:"+ contextoAtual.portaAgencia +"/" + contextoAtual.idAgencia;
+        Naming.unbind(objName);
+        
         contextoAtual.agenciaAtual = null;
         contextoAtual.idAgencia = null;
         contextoAtual.portaAgencia = -1;
@@ -93,7 +140,7 @@ public class Cliente {
         opcoes();
     }
 
-    public static void quit() {
+    private static void quit() {
         System.out.println("Encerrando...");
         System.exit(0);
     }
@@ -102,7 +149,7 @@ public class Cliente {
         return contextoAtual.agenciaAtual != null;
     }
 
-    public static void teste() throws Exception{
+    private static void teste() throws Exception{
         if(!estaConectado()) throw new Exception("Voce nao esta conectado a nenhuma agencia.");
         System.out.println("--------------------------------------------------");
         String teste = contextoAtual.agenciaAtual.teste();

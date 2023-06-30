@@ -7,15 +7,18 @@ public interface IAgencia extends Remote {
 
     String teste() throws RemoteException;
 
-    String criarAgente() throws RemoteException;
+    String enviarMensagem(String mensagem, String idAgente) throws Exception;
 
-    String enviarMensagem(String mensagem, String idAgente) throws RemoteException;
+    String receberMensagem(String mensagem, String idAgente) throws RemoteException;
 
-    String transportarAgente(String idAgente, String idAgencia) throws RemoteException;
+    String transportarAgente(String idAgente, String idAgenciaDestino) throws RemoteException;
 
-    String adicionarAgente(String idAgente, String idAgencia) throws RemoteException;
+    String adicionarAgente(byte[] arquivoCompilado) throws RemoteException;
 
-    String removerAgente(String idAgente,String idAgencia) throws RemoteException;
+    String removerAgente(String idAgente) throws RemoteException;
 
+    void setServicoNomes(IServicoNomes servicoNomes) throws RemoteException;
+
+    ServicoNomes getServicoNomes() throws RemoteException;
 
 }

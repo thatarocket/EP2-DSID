@@ -2,7 +2,9 @@ import Global.Agencia;
 import Global.IAgencia;
 import Global.IServicoNomes;
 
+import java.net.MalformedURLException;
 import java.rmi.Naming;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.Scanner;
 
@@ -34,7 +36,7 @@ public class ServidorAgencia {
         System.out.println("Conectado com o servico de nomes!");
     }
 
-    private static void criarAgencia() throws Exception {
+    private static void criarAgencia() throws RemoteException, MalformedURLException {
         System.out.println("Digite o numero da porta da agencia a ser criada: ");
         int portaAgencia = Integer.parseInt(scanner.nextLine());
         String idAgencia  = servicoNomes.registrarAgencia(portaAgencia);
@@ -48,6 +50,7 @@ public class ServidorAgencia {
         LocateRegistry.createRegistry(portaAgencia);
         String objAgencia = "rmi://localhost:" + portaAgencia + "/" + idAgencia;
         Naming.rebind(objAgencia, agencia);
+        agencia.setServicoNomes(servicoNomes);
         System.out.println("Agencia criada com sucesso! id: " + idAgencia + " porta: " + portaAgencia);
     }
 }

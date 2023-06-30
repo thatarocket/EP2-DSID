@@ -9,8 +9,8 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
         int qtdAgentes;
         int qtdAgencias;
 
-        HashMap<String, Integer> agencias = new HashMap<String, Integer>(); // <idAgencia, numPorta>
-        HashMap<String, String> agentes = new HashMap<String, String>(); // <idAgente, idAgencia>
+        HashMap<String, Integer> agencias = new HashMap<>(); // <idAgencia, numPorta>
+        HashMap<String, String> agentes = new HashMap<>(); // <idAgente, idAgencia>
 
         public ServicoNomes() throws Exception {
             super();
@@ -70,5 +70,19 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
         public HashMap<String, String> getAgentes() throws RemoteException {
                 return agentes;
         }
+
+        public void removerAgencia(String idAgencia) {
+                agencias.remove(idAgencia);
+        }
+
+        public void removerAgente(String idAgente) {
+                agentes.remove(idAgente);
+        }
+
+        public void moverAgente(String idAgente, String idAgenciaDestino) {
+                agentes.put(idAgente, idAgenciaDestino);
+        }
+
+        
 
 }

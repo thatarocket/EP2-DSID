@@ -7,8 +7,8 @@ import java.util.HashMap;
 public interface IServicoNomes extends Remote {
 
     // id do agente, id da agencia
-    HashMap<String,Integer> agencias = new HashMap<String,Integer>();
-    HashMap<String, String> agentes = new HashMap<String, String>();
+    HashMap<String,Integer> agencias = new HashMap<>();
+    HashMap<String, String> agentes = new HashMap<>();
     String teste() throws RemoteException;
     String registrarAgencia(int numPorta) throws RemoteException;
     String registrarAgente(String idAgencia) throws RemoteException;
@@ -20,5 +20,11 @@ public interface IServicoNomes extends Remote {
     HashMap<String, Integer> getAgencias() throws RemoteException;
 
     HashMap<String, String> getAgentes() throws RemoteException;
+
+    void removerAgente(String idAgente);
+
+    void moverAgente(String idAgente, String idAgenciaDestino);
+
+    void removerAgencia(String idAgencia);
 
 }
