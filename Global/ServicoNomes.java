@@ -16,11 +16,6 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
             super();
         }
 
-        @Override
-        public String teste() throws RemoteException {
-            return "Teste";
-        }
-
         public String registrarAgencia(int numPorta) throws RemoteException {
                 if(agencias.containsValue(numPorta)) {
                         return null;
@@ -39,13 +34,13 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
                 return idAgente;
         }
 
-        public String gerarIdAgencia() throws RemoteException{
+        private String gerarIdAgencia() throws RemoteException{
                 String id = "Agencia_" + qtdAgencias;
                 qtdAgencias++;
                 return id;
         }
 
-        public String gerarIdAgente() throws RemoteException{
+        private String gerarIdAgente() throws RemoteException{
                 String id = "Agente_" + qtdAgentes;
                 qtdAgentes++;
                 return id;
@@ -79,10 +74,5 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
                 agentes.remove(idAgente);
         }
 
-        public void moverAgente(String idAgente, String idAgenciaDestino) throws RemoteException {
-                agentes.put(idAgente, idAgenciaDestino);
-        }
-
-        
 
 }

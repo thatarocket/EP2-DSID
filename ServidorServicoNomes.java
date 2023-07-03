@@ -10,7 +10,7 @@ public class ServidorServicoNomes {
     public static void main(String[] args) {
         try {
             criarServico();
-            System.out.println("Aguardando agências...");
+            System.out.println("Aguardando comandos...");
         }
         catch (Exception e) {
             System.err.println("Erro no servidor: " + e);

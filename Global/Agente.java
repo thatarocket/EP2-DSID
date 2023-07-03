@@ -2,35 +2,30 @@ package Global;
 
 import java.io.Serializable;
 
-public class Agente implements IAgente, Serializable, Runnable {
+public class Agente implements IAgente, Serializable {
 
-    private String id;
-
+    private String numbers;
     public Agente() {
     }
 
-    public String getId() {
-        return id;
+    public void setNumbers(String numbers) {
+        this.numbers = numbers;
     }
 
     @Override
-    public String pararExecucao() throws Exception {
-        return null;
+    public Double soma(String numbers) throws Exception {
+        Double numero1 = Double.valueOf(numbers.split(" ")[0]);
+        Double numero2 = Double.valueOf(numbers.split(" ")[1]);
+
+        Double resultadoSoma = numero1 + numero2;
+        return resultadoSoma;
     }
 
-    @Override
-    public String transportarAgencia() throws Exception {
-        return null;
+    public static void main(String[] args) throws Exception {
+        Agente agente = new Agente();
+        agente.setNumbers(args[0]);
+        System.out.println(agente.soma(agente.numbers));
     }
 
-    @Override
-    public String comunicarComAgente() throws Exception {
-        return null;
-    }
 
-    @Override
-    public void run() {
-        // hora da festa! (ainda nao implementado)
-        System.out.println("AGENTE ESTA RODANDO"); //teste
-    }
 }
