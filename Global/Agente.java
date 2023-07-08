@@ -21,11 +21,19 @@ public class Agente implements IAgente, Serializable {
         return resultadoSoma;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static Double run(String numbers) throws Exception {
+        System.out.println("Iniciando agente...");
         Agente agente = new Agente();
-        agente.setNumbers(args[0]);
-        System.out.println(agente.soma(agente.numbers));
+        return agente.soma(numbers);
     }
+
+    public static void main(String[] args) throws Exception {
+        System.out.println("Iniciando agente...");
+        Agente agente = new Agente();
+        agente.soma(args[0]);
+    }
+
+
 
 
 }

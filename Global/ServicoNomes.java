@@ -22,6 +22,7 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
                 }
                 String idAgencia = gerarIdAgencia();
                 agencias.put(idAgencia, numPorta);
+                System.out.println("Agencia registrada com sucesso!");
                 return idAgencia;
         }
 
@@ -31,6 +32,7 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
                 }
                 String idAgente = gerarIdAgente();
                 agentes.put(idAgente, idAgencia);
+                System.out.println("Agente registrado com sucesso!");
                 return idAgente;
         }
 
@@ -68,10 +70,12 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
 
         public void removerAgencia(String idAgencia) throws RemoteException {
                 agencias.remove(idAgencia);
+                System.out.println("Agencia removida com sucesso!");
         }
 
         public void removerAgente(String idAgente) throws RemoteException {
                 agentes.remove(idAgente);
+                System.out.println("Agente removido com sucesso!");
         }
 
 

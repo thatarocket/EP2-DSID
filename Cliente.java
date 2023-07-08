@@ -62,12 +62,12 @@ public class Cliente {
     public static void opcoes() throws Exception{
         System.out.println("--------------------------------------------------");
         System.out.println("Escolha a opcao desejada! (Pelo numero)");
-        System.out.println("1 - conectar com outra agência");        // Faz o cliente se conectar com uma agênncia
-        System.out.println("2 - desconectar da agência");     // Desconectar da agência
-        System.out.println("3 - sair do programa");       // Encerra a execucao do cliente
-        System.out.println("5 - Criar agente em agencia"); //Envia o código do agente para a agência
-        System.out.println("6 - Enviar mensagem a agente ");
-        System.out.println("7 - Interromper execução de agente ");
+        System.out.println("1 - CONECTAR com outra agência");        // Faz o cliente se conectar com uma agencia
+        System.out.println("2 - DESCONECTAR da agência");     // Desconectar da agência
+        System.out.println("3 - CRIAR agente em agencia"); //Envia o código do agente para a agência
+        System.out.println("4 - ENVIAR mensagem a agente ");
+        System.out.println("5 - INTERROMPER execução de agente ");
+        System.out.println("6 - SAIR do programa");       // Encerra a execucao do cliente
         selecionar();
     }
 
@@ -86,19 +86,19 @@ public class Cliente {
                 opcoes();
                 break;
             case 3:
-                quit();
-                break;
-            case 4:
                 criarAgente();
                 opcoes();
                 break;
-            case 5:
+            case 4:
                 enviarMensagemAgente();
                 opcoes();
                 break;
-            case 6:
+            case 5:
                 interromperExecucaoAgente();
                 opcoes();
+                break;
+            case 6:
+                quit();
                 break;
             default:
                 System.out.println("Opcao invalida! Coloque uma opcao valida:");
@@ -108,7 +108,9 @@ public class Cliente {
 
     private static void criarAgente() throws Exception {
         File arquivoClass = compilarAgente();
-        contextoAtual.agenciaAtual.adicionarAgente(arquivoClass);
+        String idAgente = contextoAtual.agenciaAtual.adicionarAgente(arquivoClass);
+        contextoAtual.idAgente = idAgente;
+        System.out.println("Agente criado com sucesso! Id: " + idAgente);
     }
 
     private static File compilarAgente() throws Exception {
@@ -123,12 +125,12 @@ public class Cliente {
     private static void enviarMensagemAgente() throws Exception {
         if(!estaConectado()) throw new Exception("Voce nao esta conectado a nenhuma agencia.");
 
-        System.out.println("Digite o id do agente a ser interrompido: ");
+        System.out.println("Digite o id do agente para receber a mensagem: ");
         String idAgente = scanner.nextLine();
         System.out.println("Digite a mensagem a ser enviada: ");
         String mensagem = scanner.nextLine();
 
-        contextoAtual.agenciaAtual.enviarMensagem(idAgente, mensagem);
+        contextoAtual.agenciaAtual.enviarMensagem(mensagem,idAgente);
     }
 
     private static void interromperExecucaoAgente() throws Exception {

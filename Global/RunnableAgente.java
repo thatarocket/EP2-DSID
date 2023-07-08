@@ -17,7 +17,7 @@ public class RunnableAgente implements Runnable {
     public void run() {
         try {
             ProcessBuilder processBuilder = new ProcessBuilder();
-            processBuilder.command("java", arquivoClass.getName().replace(".class",""));
+            processBuilder.command("java", arquivoClass.getName().replace(".class","1 2"));
             Process process = processBuilder.start();
             process.waitFor();
 

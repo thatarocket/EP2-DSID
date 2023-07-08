@@ -1,6 +1,13 @@
 package Global;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -8,7 +15,6 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 
 import java.io.File;
-import java.util.Map;
 
 public class Agencia extends UnicastRemoteObject implements IAgencia {
 
@@ -18,9 +24,9 @@ public class Agencia extends UnicastRemoteObject implements IAgencia {
 
     private IServicoNomes servicoNomes;
 
-    private HashMap<String,File> agentes = new HashMap<>(); // Agente, idAgente
+    private HashMap<String,File> agentes = new HashMap<>(); // idAgente, Agente
 
-    private Map<String, Thread> threads;
+    private HashMap<String, Thread> threads = new HashMap<>(); // idAgente, Thread
 
     public Agencia() throws RemoteException {
         super();
@@ -33,14 +39,29 @@ public class Agencia extends UnicastRemoteObject implements IAgencia {
 
     @Override
     public String enviarMensagem(String mensagem, String idAgente) throws Exception {
-        String nomeAgencia = servicoNomes.getAgente(idAgente);
-        int localAgencia = servicoNomes.getAgencia(nomeAgencia);
+        String resposta = "";
 
-        String objName = "rmi://localhost:" + localAgencia + "/" + nomeAgencia;
-        IAgencia agenciaConectada = (IAgencia) Naming.lookup(objName);
+        System.out.println("EnviarMensagem: mensagem recebida " + mensagem);
+        String idAgencia = servicoNomes.getAgente(idAgente);
 
-        String resposta = agenciaConectada.receberMensagem(mensagem, idAgente);
-        Naming.unbind(objName);
+        if(idAgencia == null) {
+            return "Agente não encontrado!";
+        }
+
+        System.out.println("idAgencia encontrado: " + idAgencia + " idAgencia atual: " + this.id);
+
+        if(!idAgencia.equals(this.id)) {
+            System.out.println("entrou no if");
+            String nomeAgencia = servicoNomes.getAgente(idAgente);
+            int localAgencia = servicoNomes.getAgencia(nomeAgencia);
+
+            String objName = "rmi://localhost:" + localAgencia + "/" + nomeAgencia;
+            IAgencia agenciaConectada = (IAgencia) Naming.lookup(objName);
+
+            resposta = agenciaConectada.receberMensagem(mensagem, idAgente);
+            Naming.unbind(objName);
+        }
+        else resposta = receberMensagem(mensagem, idAgente);
 
         if(resposta.equals("Agente não encontrado!")){
             return resposta;
@@ -48,23 +69,49 @@ public class Agencia extends UnicastRemoteObject implements IAgencia {
         return "O resultado da soma é: " + resposta;
     }
 
+    private String getClassNameFromFile(File arquivoClass) {
+        String fileName = arquivoClass.getName();
+        return fileName.substring(0, fileName.lastIndexOf('.')).replace('/', '.');
+    }
     @Override
-    public String receberMensagem(String mensagem, String idAgente) throws RemoteException, MalformedURLException, NotBoundException {
-        // Recebe mensagem de um agente (enviado pela agencia) e envia ela para o outro agente
+    public String receberMensagem(String mensagem, String idAgente) throws RemoteException, ClassNotFoundException, NoSuchMethodException, MalformedURLException, InvocationTargetException, InstantiationException, IllegalAccessException {
         // Pega o agente e executa o metodo soma, passando os parametros
         // Retorna o resultado da soma
-
+        System.out.println("Entrou no receberMensagem");
         File file = agentes.get(idAgente);
         if(file == null){
             return "Agente não encontrado!";
         }
+        Thread thread = threads.get(idAgente);
+        if(thread == null){
+            return "Agente não encontrado!";
+        }
 
-//        RunnableAgente runnableAgente = new RunnableAgente(file);
-//        Thread thread = new Thread(runnableAgente);
-//        thread.start();
-//        threads.put(idAgente, thread);
+        System.out.println("Conseguiu pegar thread e file");
 
-        return resultadoSoma.toString();
+        try {
+
+            URLClassLoader classLoader = new URLClassLoader(new URL[]{file.getParentFile().toURI().toURL()});
+
+            System.out.println("getClassNameFromFile: " + getClassNameFromFile(file));
+
+            Class<?> agenteClass = classLoader.loadClass(getClassNameFromFile(file));
+
+            System.out.println("Depois do classLoader");
+
+            Object agenteInstance = agenteClass.getDeclaredConstructor().newInstance();
+            Method metodoSoma = agenteClass.getMethod("soma", String.class);
+
+            System.out.println("Depois do getMethod");
+            Double resultadoSoma = (Double) metodoSoma.invoke(agenteInstance, mensagem);
+            System.out.println("Depois da soma");
+
+            return "O resultado da soma, segundo o agente " + idAgente + ", foi de " + resultadoSoma;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return "Erro ao executar agente!";
+        }
     }
 
     @Override
@@ -99,9 +146,12 @@ public class Agencia extends UnicastRemoteObject implements IAgencia {
             Thread thread = new Thread(runnableAgente);
             thread.start();
 
+            System.out.println("Thread do agente iniciada com sucesso!");
+
             String idAgente = servicoNomes.registrarAgente(this.id);
             agentes.put(idAgente,arquivoClass);
             threads.put(idAgente,thread);
+            System.out.println("Agente " + idAgente + " adicionado com sucesso!");
             return idAgente;
         }
         catch (Exception e) {

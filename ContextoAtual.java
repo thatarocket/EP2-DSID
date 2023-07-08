@@ -10,5 +10,5 @@ public class ContextoAtual {
     String idAgencia;
     int portaAgencia;
 
-//    Agente agenteAtual;
+    String idAgente;
 }
