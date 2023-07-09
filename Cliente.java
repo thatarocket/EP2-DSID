@@ -130,7 +130,8 @@ public class Cliente {
         System.out.println("Digite a mensagem a ser enviada: ");
         String mensagem = scanner.nextLine();
 
-        contextoAtual.agenciaAtual.enviarMensagem(mensagem,idAgente);
+        String resposta = contextoAtual.agenciaAtual.enviarMensagem(mensagem,idAgente);
+        System.out.println(resposta);
     }
 
     private static void interromperExecucaoAgente() throws Exception {

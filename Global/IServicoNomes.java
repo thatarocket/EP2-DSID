@@ -22,4 +22,6 @@ public interface IServicoNomes extends Remote {
 
     void removerAgencia(String idAgencia) throws RemoteException;
 
+    void transportarAgente(String idAgente, String idAgencia) throws RemoteException;
+
 }

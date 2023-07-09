@@ -11,7 +11,7 @@ public interface IAgencia extends Remote {
 
     String enviarMensagem(String mensagem, String idAgente) throws Exception;
 
-    String receberMensagem(String mensagem, String idAgente) throws RemoteException, MalformedURLException, NotBoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, ClassNotFoundException, InstantiationException;
+    String receberMensagem(String mensagem, String idAgente) throws Exception;
 
     String transportarAgente(String idAgente, String idAgenciaDestino) throws RemoteException, MalformedURLException, NotBoundException;
 
@@ -22,5 +22,7 @@ public interface IAgencia extends Remote {
     void setServicoNomes(IServicoNomes servicoNomes) throws RemoteException;
 
     ServicoNomes getServicoNomes() throws RemoteException;
+    String mudarAgente(Anonymous agente, String idAgente) throws RemoteException, MalformedURLException, NotBoundException;
+
 
 }

@@ -78,5 +78,11 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
                 System.out.println("Agente removido com sucesso!");
         }
 
+        public void transportarAgente(String idAgente, String idAgencia) throws RemoteException {
+               // pegar onde o agente está e mudar para ele estar associado com a nova agencia
+                agentes.put(idAgente, idAgencia);
+                System.out.println("Agente transportado com sucesso!");
+        }
+
 
 }
