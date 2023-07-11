@@ -46,7 +46,7 @@ public class ServidorAgencia {
             criarAgencia();
         }
 
-        IAgencia agencia = new Agencia(idAgencia,portaAgencia);
+        IAgencia agencia = new Agencia(idAgencia);
         LocateRegistry.createRegistry(portaAgencia);
         String objAgencia = "rmi://localhost:" + portaAgencia + "/" + idAgencia;
         Naming.rebind(objAgencia, agencia);

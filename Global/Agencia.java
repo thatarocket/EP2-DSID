@@ -1,8 +1,5 @@
 package Global;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -11,13 +8,10 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 
 import java.io.File;
-import java.util.Map;
 
 public class Agencia extends UnicastRemoteObject implements IAgencia {
 
     private String id;
-
-    private int porta;
 
     private IServicoNomes servicoNomes;
 
@@ -25,13 +19,8 @@ public class Agencia extends UnicastRemoteObject implements IAgencia {
 
     private HashMap<String, Thread> threads = new HashMap<>(); // idAgente, Thread
 
-    public Agencia() throws RemoteException {
-        super();
-    }
-
-    public Agencia(String id, int porta) throws RemoteException {
+    public Agencia(String id) throws RemoteException {
         this.id = id;
-        this.porta = porta;
     }
 
     @Override
@@ -49,7 +38,6 @@ public class Agencia extends UnicastRemoteObject implements IAgencia {
 
             String objName = "rmi://localhost:" + localAgencia + "/" + nomeAgencia;
             IAgencia agenciaConectada = (IAgencia) Naming.lookup(objName);
-
             resposta = agenciaConectada.receberMensagem(mensagem, idAgente);
             Naming.unbind(objName);
         }
@@ -66,11 +54,12 @@ public class Agencia extends UnicastRemoteObject implements IAgencia {
             return "Agente não encontrado!";
         }
 
-        Object resultadoSomaObj = agente.call("receberMensagem", mensagem);
-        double resultadoSoma = Double.parseDouble(resultadoSomaObj.toString());
-        System.out.println("Resultado da soma: " + resultadoSoma);
-
-        return "O resultado da soma, segundo o agente " + idAgente + ", foi de " + resultadoSoma;
+        synchronized (agente) {
+            Object resultadoSomaObj = agente.call("receberMensagem", mensagem);
+            double resultadoSoma = Double.parseDouble(resultadoSomaObj.toString());
+            System.out.println("Resultado da soma: " + resultadoSoma);
+            return "O resultado da soma, segundo o agente " + idAgente + ", foi de " + resultadoSoma;
+        }
     }
 
     @Override
@@ -78,7 +67,7 @@ public class Agencia extends UnicastRemoteObject implements IAgencia {
         // Transporta um agente para outra agencia
         // Contata o servico de nomes para saber em qual servidor esta a agencia de destino
         // O objeto do agente deve estar serializado 
-        // Envia o agente serializado para a agencia de destino [?????]
+        // Envia o agente serializado para a agencia de destino
         // Remove o agente da agencia atual
         // Indica que foi transmitido pela rede
 
@@ -98,6 +87,7 @@ public class Agencia extends UnicastRemoteObject implements IAgencia {
         Anonymous agente = agentes.get(idAgente);
         agenciaConectada.mudarAgente(agente, idAgente);
         agentes.remove(idAgente);
+        threads.remove(idAgente);
 
         Naming.unbind(objName);
         return "Agente transportado com sucesso!";
@@ -105,12 +95,9 @@ public class Agencia extends UnicastRemoteObject implements IAgencia {
 
     public String mudarAgente(Anonymous agente, String idAgente) throws RemoteException {
         try {
-
             servicoNomes.transportarAgente(idAgente, this.id);
-
             agentes.put(idAgente,agente);
-//            threads.put(idAgente,thread);
-
+            threads.put(idAgente,threads.get(idAgente));
             System.out.println("Agente " + idAgente + " adicionado com sucesso!");
             return idAgente;
         }
@@ -137,7 +124,6 @@ public class Agencia extends UnicastRemoteObject implements IAgencia {
             agentes.put(idAgente,agente);
             threads.put(idAgente,thread);
             System.out.println("Agente " + idAgente + " adicionado com sucesso!");
-            System.out.println("CRIAR: Estado da thread: " + threads.get(idAgente).getState());
             return idAgente;
         }
         catch (Exception e) {
@@ -158,14 +144,6 @@ public class Agencia extends UnicastRemoteObject implements IAgencia {
         servicoNomes.removerAgente(idAgente);
         agentes.remove(idAgente);
         return "Agente interrompido com sucesso!";
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public int getPorta() {
-        return porta;
     }
 
     public void setServicoNomes(IServicoNomes servicoNomes) throws RemoteException {

@@ -35,8 +35,8 @@ public class Agente implements IAgente, Serializable, Runnable {
                 }
             }
         }
-        catch (Exception e) {
-            e.printStackTrace();
+        catch (InterruptedException e) {
+            System.out.println("Agente interrompido!");
         }
     }
 }
