@@ -1,11 +1,9 @@
 package Global;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -13,6 +11,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 
 import java.io.File;
+import java.util.Map;
 
 public class Agencia extends UnicastRemoteObject implements IAgencia {
 
@@ -37,7 +36,7 @@ public class Agencia extends UnicastRemoteObject implements IAgencia {
 
     @Override
     public String enviarMensagem(String mensagem, String idAgente) throws Exception {
-        String resposta = "";
+        String resposta;
 
         String idAgencia = servicoNomes.getAgente(idAgente);
         if(idAgencia == null) {
@@ -66,13 +65,9 @@ public class Agencia extends UnicastRemoteObject implements IAgencia {
         if(agente == null){
             return "Agente não encontrado!";
         }
-        System.out.println("1: Estado da thread: " + threads.get(idAgente).getState());
-        agente.call("receberMensagem", mensagem);
-        System.out.println("2: Estado da thread: " + threads.get(idAgente).getState());
 
-        Object resultadoSomaObj = agente.call("soma", mensagem);
+        Object resultadoSomaObj = agente.call("receberMensagem", mensagem);
         double resultadoSoma = Double.parseDouble(resultadoSomaObj.toString());
-
         System.out.println("Resultado da soma: " + resultadoSoma);
 
         return "O resultado da soma, segundo o agente " + idAgente + ", foi de " + resultadoSoma;
@@ -108,13 +103,13 @@ public class Agencia extends UnicastRemoteObject implements IAgencia {
         return "Agente transportado com sucesso!";
     }
 
-    public String mudarAgente(Anonymous agente, String idAgente) throws RemoteException, MalformedURLException, NotBoundException {
+    public String mudarAgente(Anonymous agente, String idAgente) throws RemoteException {
         try {
-            Thread thread = new Thread((Runnable) agente);
+
             servicoNomes.transportarAgente(idAgente, this.id);
 
             agentes.put(idAgente,agente);
-            threads.put(idAgente,thread);
+//            threads.put(idAgente,thread);
 
             System.out.println("Agente " + idAgente + " adicionado com sucesso!");
             return idAgente;
@@ -125,11 +120,6 @@ public class Agencia extends UnicastRemoteObject implements IAgencia {
         }
     }
 
-    public static Anonymous converterClasse(File classFile) throws Exception {
-        Anonymous anonymous = new Anonymous(classFile);
-        return anonymous;
-    }
-
     @Override
     public String adicionarAgente(File arquivoClass) throws RemoteException {
         try {
@@ -138,16 +128,16 @@ public class Agencia extends UnicastRemoteObject implements IAgencia {
             // Executa o agente por meio de uma thread
             // retorna o id ao usuario
 
-            Anonymous agente = converterClasse(arquivoClass);
-            Thread thread = new Thread(agente);
+            Anonymous agente = new Anonymous(arquivoClass);
+            Thread thread = new Thread((Runnable) agente.getObject());
             thread.start();
             System.out.println("Thread do agente iniciada com sucesso!");
-            System.out.println("AdicionarAgente: Estado da thread: " + thread.getState());
 
             String idAgente = servicoNomes.registrarAgente(this.id);
             agentes.put(idAgente,agente);
             threads.put(idAgente,thread);
             System.out.println("Agente " + idAgente + " adicionado com sucesso!");
+            System.out.println("CRIAR: Estado da thread: " + threads.get(idAgente).getState());
             return idAgente;
         }
         catch (Exception e) {

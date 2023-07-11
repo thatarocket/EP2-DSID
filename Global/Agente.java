@@ -1,54 +1,42 @@
 package Global;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicReference;
+
 
 public class Agente implements IAgente, Serializable, Runnable {
-
-    private String mensagem;
-
-    private double resultadoSoma;
-    private final Object lock = new Object();
+    private AtomicReference<String> mensagem = new AtomicReference<>();
     public Agente() {
     }
 
     public Double soma(String numbers) {
-
         Double numero1 = Double.valueOf(numbers.split(" ")[0]);
         Double numero2 = Double.valueOf(numbers.split(" ")[1]);
-
-        this.resultadoSoma = numero1 + numero2;
-        return resultadoSoma;
+        return numero1 + numero2;
     }
 
-    public void receberMensagem(String msg) {
-        synchronized (lock) {
-            this.mensagem = msg;
-            lock.notifyAll();
-        }
-    }
-
-    public double getResultadoSoma() {
-        return resultadoSoma;
+    public Double receberMensagem(String msg) {
+        mensagem.set(msg);
+        return soma(msg);
     }
 
     @Override
     public void run() {
-        System.out.println("Agente executando");
-        while (true) {
-            synchronized (lock) {
-                while (mensagem == null) {
-                    try {
-                        lock.wait();
-                    } catch (InterruptedException e) {
-                        // Lidar com a interrupção da thread, se necessário
-                    }
+        try {
+            while (true) {
+                if(mensagem.get() == null) {
+                    System.out.println("Agente irá dormir por um minuto...");
+                    Thread.sleep(60000); // 1 minutos
                 }
-                System.out.println("Mensagem recebida: " + mensagem);
-                System.out.println("Resultado da soma: " + soma(mensagem));
-                mensagem = null;
+                else {
+                    System.out.println("Mensagem recebida: " + mensagem);
+                    System.out.println("Resultado da soma: " + soma(String.valueOf(mensagem)));
+                    mensagem.set(null);
+                }
             }
         }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-
-
 }

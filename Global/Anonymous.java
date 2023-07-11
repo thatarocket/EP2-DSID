@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-public class Anonymous extends ClassLoader implements Runnable {
+public class Anonymous extends ClassLoader {
 
     private Class<?> loadedClass;
 
@@ -30,8 +30,7 @@ public class Anonymous extends ClassLoader implements Runnable {
                 .invoke(this.object, args);
     }
 
-    @Override
-    public void run() {
-        System.out.println("Thread do agente iniciada");
+    public Object getObject() {
+        return this.object;
     }
 }
