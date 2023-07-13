@@ -18,6 +18,7 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
 
         public String registrarAgencia(int numPorta) throws RemoteException {
                 if(agencias.containsValue(numPorta)) {
+                        System.out.println("Agencia já cadastrada");
                         return null;
                 }
                 String idAgencia = gerarIdAgencia();
@@ -28,6 +29,7 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
 
         public String registrarAgente(String idAgencia) throws RemoteException {
                 if(!agencias.containsKey(idAgencia)) {
+                        System.out.println("Agente já cadastrado");
                         return null;
                 }
                 String idAgente = gerarIdAgente();

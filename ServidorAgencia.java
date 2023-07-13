@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class ServidorAgencia {
     static Scanner scanner = new Scanner(System.in);
     static IServicoNomes servicoNomes;
-
+    static final String NOME_SERVICO_NOMES = "servicoNomes";
 
     public static void main(String[] args) {
         try {
@@ -28,8 +28,7 @@ public class ServidorAgencia {
     private static void conectarServicoNomes() throws Exception{
         System.out.println("Digite o numero da porta do servidor de nomes: ");
         int portaServidor = Integer.parseInt(scanner.nextLine());
-        String nomeServicoNomes = "servicoNomes";
-        String objServico = "rmi://localhost:" + portaServidor + "/" + nomeServicoNomes;
+        String objServico = "rmi://localhost:" + portaServidor + "/" + NOME_SERVICO_NOMES;
 
         System.out.println("Conectando com o servico de nomes...");
         servicoNomes = (IServicoNomes) Naming.lookup(objServico);

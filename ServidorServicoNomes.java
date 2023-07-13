@@ -7,6 +7,8 @@ import java.util.Scanner;
 
 public class ServidorServicoNomes {
     static Scanner scanner = new Scanner (System.in);
+    static final String NOME_SERV  = "servicoNomes";
+    
     public static void main(String[] args) {
         try {
             criarServico();
@@ -22,10 +24,9 @@ public class ServidorServicoNomes {
         IServicoNomes serv = new ServicoNomes();
         System.out.println("Digite o numero da porta: ");
         int numPorta = Integer.parseInt(scanner.nextLine());
-        String nomeServ  = "servicoNomes";
         LocateRegistry.createRegistry(numPorta);
 
-        String objName = "rmi://localhost:" + numPorta + "/" + nomeServ;
+        String objName = "rmi://localhost:" + numPorta + "/" + NOME_SERV;
         Naming.rebind(objName, serv);
     }
 }
