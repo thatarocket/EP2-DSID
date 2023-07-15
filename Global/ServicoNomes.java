@@ -3,8 +3,12 @@ package Global;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
+import java.util.Scanner;
+import java.util.Iterator;
+import java.util.Map;
 
 public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
+        static Scanner scanner = new Scanner(System.in);
 
         int qtdAgentes;
         int qtdAgencias;
@@ -13,22 +17,48 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
         HashMap<String, String> agentes = new HashMap<>(); // <idAgente, idAgencia>
 
         public ServicoNomes() throws RemoteException {
-            super();
+                super();
         }
 
         public String registrarAgencia(int numPorta) throws RemoteException {
-                if(agencias.containsValue(numPorta)) {
-                        System.out.println("Agencia já cadastrada");
+                String idAgencia = null;
+                if (agencias.containsValue(numPorta)) {
+                        System.out.println("Ja existe uma agencia nessa porta, deseja exclui-la e cadastrar outra?");
+                        System.out.println("Escolha a opcao desejada! (Pelo numero)");
+                        System.out.println("1 - Sim! Limpar porta e cadastrar outra agencia nela");
+                        System.out.println("2 - Nao! Cadastrarei com outra porta");
+                        try {
+                                selecionar(idAgencia, numPorta);
+                        } catch (Exception e) {
+                                e.printStackTrace();
+                        }
                         return null;
+                } else {
+                        idAgencia = gerarIdAgencia();
+                        agencias.put(idAgencia, numPorta);
                 }
-                String idAgencia = gerarIdAgencia();
-                agencias.put(idAgencia, numPorta);
-                System.out.println("Agencia registrada com sucesso!");
                 return idAgencia;
         }
 
+        public void selecionar(String idAgencia, int numPorta) throws Exception {
+                System.out.println("INSIRA A OPCAO DESEJADA: ");
+                int input = Integer.parseInt(scanner.nextLine());
+
+                switch (input) {
+                        case 1:
+                                removerAgenciaPorPorta(numPorta);
+                                idAgencia = gerarIdAgencia();
+                                agencias.put(idAgencia, numPorta);
+                                break;
+                        case 2:
+                                break;
+                        default:
+                                break;
+                }
+        }
+
         public String registrarAgente(String idAgencia) throws RemoteException {
-                if(!agencias.containsKey(idAgencia)) {
+                if (!agencias.containsKey(idAgencia)) {
                         System.out.println("Agente já cadastrado");
                         return null;
                 }
@@ -38,24 +68,24 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
                 return idAgente;
         }
 
-        private String gerarIdAgencia() throws RemoteException{
+        private String gerarIdAgencia() throws RemoteException {
                 String id = "Agencia_" + qtdAgencias;
                 qtdAgencias++;
                 return id;
         }
 
-        private String gerarIdAgente() throws RemoteException{
+        private String gerarIdAgente() throws RemoteException {
                 String id = "Agente_" + qtdAgentes;
                 qtdAgentes++;
                 return id;
         }
 
-        //localizacao agencia
+        // localizacao agencia
         public int getAgencia(String idAgencia) throws RemoteException {
                 return agencias.get(idAgencia);
         }
 
-        //localizacao agente
+        // localizacao agente
         public String getAgente(String idAgente) throws RemoteException {
                 return agentes.get(idAgente);
         }
@@ -75,16 +105,25 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
                 System.out.println("Agencia removida com sucesso!");
         }
 
+        public void removerAgenciaPorPorta(int porta) throws RemoteException {
+                Iterator<Map.Entry<String, Integer>> iterator = agencias.entrySet().iterator();
+                while (iterator.hasNext()) {
+                        Map.Entry<String, Integer> entry = iterator.next();
+                        if (entry.getValue() == porta) {
+                                removerAgencia(entry.getKey());
+                        }
+                }
+                System.out.println("Agencia removida com sucesso!");
+        }
+
         public void removerAgente(String idAgente) throws RemoteException {
                 agentes.remove(idAgente);
                 System.out.println("Agente removido com sucesso!");
         }
 
         public void transportarAgente(String idAgente, String idAgencia) throws RemoteException {
-               // pegar onde o agente está e mudar para ele estar associado com a nova agencia
+                // pegar onde o agente está e mudar para ele estar associado com a nova agencia
                 agentes.put(idAgente, idAgencia);
                 System.out.println("Agente transportado com sucesso!");
         }
-
-
 }
