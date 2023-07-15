@@ -42,7 +42,6 @@ public class ServidorAgencia {
         int portaAgencia = Integer.parseInt(scanner.nextLine());
         if (isPortaEmUso(portaAgencia)) {
             System.out.println("Erro ao registrar agencia! Porta ja esta sendo utilizada, escolha alguma outra");
-<<<<<<< HEAD
             criarAgencia();
         }
 
@@ -50,12 +49,8 @@ public class ServidorAgencia {
 
         if (idAgencia == null) {
             System.out.println("Escolha outra porta para criar a agencia!");
-=======
->>>>>>> aa7dd143e1bf01b3d15de730c3d697101162525b
             criarAgencia();
         }
-
-        String idAgencia = servicoNomes.registrarAgencia(portaAgencia);
 
         IAgencia agencia = new Agencia(idAgencia);
         LocateRegistry.createRegistry(portaAgencia);
