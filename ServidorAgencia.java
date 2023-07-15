@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class ServidorAgencia {
@@ -15,7 +16,7 @@ public class ServidorAgencia {
     static IServicoNomes servicoNomes;
     static final String NOME_SERVICO_NOMES = "servicoNomes";
 
-    public static void main(String[] args) throws RemoteException, MalformedURLException {
+    public static void main(String[] args) throws Exception {
         try {
             conectarServicoNomes();
             criarAgencia();
@@ -37,7 +38,7 @@ public class ServidorAgencia {
         System.out.println("Conectado com o servico de nomes!");
     }
 
-    private static void criarAgencia() throws RemoteException, MalformedURLException {
+    private static void criarAgencia() throws Exception {
         System.out.println("Digite o numero da porta da agencia a ser criada: ");
         int portaAgencia = Integer.parseInt(scanner.nextLine());
         if (isPortaEmUso(portaAgencia)) {
@@ -50,8 +51,38 @@ public class ServidorAgencia {
         if (idAgencia == null) {
             System.out.println("Escolha outra porta para criar a agencia!");
             criarAgencia();
+        } else if (idAgencia.contentEquals("ERRO_PORTA")) {
+            System.out.println("Ja existe uma agencia nessa porta, deseja exclui-la e cadastrar outra?");
+            System.out.println("Escolha a opcao desejada! (Pelo numero)");
+            System.out.println("1 - Sim! Limpar porta e cadastrar outra agencia nela");
+            System.out.println("2 - Nao! Cadastrarei com outra porta");
+            selecionar(idAgencia, portaAgencia);
+            return;
         }
+        conectarNaPorta(idAgencia, portaAgencia);
+    }
 
+    public static void selecionar(String idAgencia, int numPorta) throws Exception {
+        System.out.println("INSIRA A OPCAO DESEJADA: ");
+        int input = Integer.parseInt(scanner.nextLine());
+
+        switch (input) {
+            case 1:
+                servicoNomes.removerAgenciaPorPorta(numPorta);
+                String idAgencia_ = servicoNomes.gerarIdAgencia();
+                servicoNomes.getAgencias().put(idAgencia_, numPorta);
+                conectarNaPorta(idAgencia_, numPorta);
+                break;
+            case 2:
+                criarAgencia();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private static void conectarNaPorta(String idAgencia, int portaAgencia)
+            throws RemoteException, MalformedURLException {
         IAgencia agencia = new Agencia(idAgencia);
         LocateRegistry.createRegistry(portaAgencia);
         String objAgencia = "rmi://localhost:" + portaAgencia + "/" + idAgencia;

@@ -23,38 +23,11 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
         public String registrarAgencia(int numPorta) throws RemoteException {
                 String idAgencia = null;
                 if (agencias.containsValue(numPorta)) {
-                        System.out.println("Ja existe uma agencia nessa porta, deseja exclui-la e cadastrar outra?");
-                        System.out.println("Escolha a opcao desejada! (Pelo numero)");
-                        System.out.println("1 - Sim! Limpar porta e cadastrar outra agencia nela");
-                        System.out.println("2 - Nao! Cadastrarei com outra porta");
-                        try {
-                                selecionar(idAgencia, numPorta);
-                        } catch (Exception e) {
-                                e.printStackTrace();
-                        }
-                        return null;
-                } else {
-                        idAgencia = gerarIdAgencia();
-                        agencias.put(idAgencia, numPorta);
+                        return "ERRO_PORTA";
                 }
+                idAgencia = gerarIdAgencia();
+                agencias.put(idAgencia, numPorta);
                 return idAgencia;
-        }
-
-        public void selecionar(String idAgencia, int numPorta) throws Exception {
-                System.out.println("INSIRA A OPCAO DESEJADA: ");
-                int input = Integer.parseInt(scanner.nextLine());
-
-                switch (input) {
-                        case 1:
-                                removerAgenciaPorPorta(numPorta);
-                                idAgencia = gerarIdAgencia();
-                                agencias.put(idAgencia, numPorta);
-                                break;
-                        case 2:
-                                break;
-                        default:
-                                break;
-                }
         }
 
         public String registrarAgente(String idAgencia) throws RemoteException {
@@ -68,7 +41,7 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
                 return idAgente;
         }
 
-        private String gerarIdAgencia() throws RemoteException {
+        public String gerarIdAgencia() throws RemoteException {
                 String id = "Agencia_" + qtdAgencias;
                 qtdAgencias++;
                 return id;

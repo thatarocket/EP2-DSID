@@ -28,6 +28,8 @@ public interface IServicoNomes extends Remote {
 
     void transportarAgente(String idAgente, String idAgencia) throws RemoteException;
 
-    public void removerAgenciaPorPorta(int porta) throws RemoteException;
+    void removerAgenciaPorPorta(int porta) throws RemoteException;
+
+    String gerarIdAgencia() throws RemoteException;
 
 }
