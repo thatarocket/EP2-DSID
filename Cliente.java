@@ -1,3 +1,4 @@
+import Global.Agencia;
 import Global.IAgencia;
 import Global.IServicoNomes;
 
@@ -7,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.rmi.Naming;
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -36,35 +38,6 @@ public class Cliente {
         encontrarAgencia();
     }
 
-    private static void encontrarAgencia() throws Exception {
-        System.out.println("Agencias disponiveis: ");
-        HashMap<String, Integer> listaAgencias = contextoAtual.servicoNomes.getAgencias();
-        for (String i : listaAgencias.keySet()) {
-            System.out.println("agencia: " + i + " porta: " + listaAgencias.get(i));
-        }
-
-        System.out.println("Digite o nome da agencia a ser conectada: ");
-        String nomeAgencia = scanner.nextLine();
-
-        int numPorta = listaAgencias.get(nomeAgencia);
-        if (!isPortaEmUso(numPorta)) {
-            // porta nao esta em uso
-            System.out.println(
-                    "Hmm parece que a agencia cadastrada nesta porta ja nao se encontra em operacao, tente logar em outra ");
-            contextoAtual.servicoNomes.removerAgencia(nomeAgencia);
-            encontrarServico();
-        }
-
-        String objName = "rmi://localhost:" + numPorta + "/" + nomeAgencia;
-
-        contextoAtual.agenciaAtual = (IAgencia) Naming.lookup(objName);
-        contextoAtual.idAgencia = nomeAgencia;
-        contextoAtual.portaAgencia = numPorta;
-
-        System.out.println("Conectado com sucesso!");
-        opcoes();
-    }
-
     public static void opcoes() throws Exception {
         System.out.println("--------------------------------------------------");
         System.out.println("Escolha a opcao desejada! (Pelo numero)");
@@ -72,8 +45,9 @@ public class Cliente {
         System.out.println("2 - DESCONECTAR da agencia"); // Desconectar da agência
         System.out.println("3 - CRIAR agente em agencia"); // Envia o código do agente para a agência
         System.out.println("4 - ENVIAR mensagem a agente ");
-        System.out.println("5 - INTERROMPER execução de agente ");
+        System.out.println("5 - INTERROMPER execucao de agente ");
         System.out.println("6 - SAIR do programa"); // Encerra a execucao do cliente
+        System.out.println("7 - LISTAR agencias disponiveis");
         selecionar();
     }
 
@@ -83,9 +57,15 @@ public class Cliente {
 
         switch (input) {
             case 1:
-                desconectar();
-                encontrarAgencia();
-                opcoes();
+                System.out.println("Digite o nome da agencia desejada: ");
+                String nomeAgenciaDesejada = scanner.nextLine();
+                if (nomeAgenciaDesejada.equals(contextoAtual.idAgencia)) {
+                    System.out.println("Ja conectado a essa agencia");
+                    opcoes();
+                } else {
+                    desconectar();
+                    encontrarAgencia();
+                }
                 break;
             case 2:
                 desconectar();
@@ -106,10 +86,50 @@ public class Cliente {
             case 6:
                 quit();
                 break;
+            case 7:
+                listarAgenciasDisponiveis();
+                break;
             default:
                 System.out.println("Opcao invalida! Coloque uma opcao valida:");
                 opcoes();
         }
+    }
+
+    private static void listarAgenciasDisponiveis() throws RemoteException {
+        System.out.println("Agencias disponiveis: ");
+        HashMap<String, Integer> listaAgencias = contextoAtual.servicoNomes.getAgencias();
+        for (String i : listaAgencias.keySet()) {
+            System.out.println("agencia: " + i + " porta: " + listaAgencias.get(i));
+        }
+    }
+
+    private static void encontrarAgencia() throws Exception {
+        listarAgenciasDisponiveis();
+        System.out.println("Digite o nome da agencia a ser conectada: ");
+        String nomeAgencia = scanner.nextLine();
+
+        int numPorta = contextoAtual.servicoNomes.getAgencia(nomeAgencia);
+        if (numPorta == 0) {
+            System.out.println("Agencia nao encontrada, tente novamente");
+            encontrarAgencia();
+        }
+
+        if (!isPortaEmUso(numPorta)) {
+            // porta nao esta em uso
+            System.out.println(
+                    "Hmm parece que a agencia cadastrada nesta porta ja nao se encontra em operacao, tente logar em outra ");
+            contextoAtual.servicoNomes.removerAgencia(nomeAgencia);
+            encontrarAgencia();
+        }
+
+        String objName = "rmi://localhost:" + numPorta + "/" + nomeAgencia;
+
+        contextoAtual.agenciaAtual = (IAgencia) Naming.lookup(objName);
+        contextoAtual.idAgencia = nomeAgencia;
+        contextoAtual.portaAgencia = numPorta;
+
+        System.out.println("Conectado com sucesso!");
+        opcoes();
     }
 
     private static void criarAgente() throws Exception {
@@ -153,10 +173,16 @@ public class Cliente {
     }
 
     private static void desconectar() throws Exception {
-        if (!estaConectado())
-            throw new Exception("Voce nao esta conectado a nenhuma agencia.");
+        if (!estaConectado()) {
+            System.out.println("Voce nao esta conectado a nenhuma agencia. Conecte-se a uma");
+            return;
+        }
+
         String objName = "rmi://localhost:" + contextoAtual.portaAgencia + "/" + contextoAtual.idAgencia;
+        System.out.println("Desconectando da " + contextoAtual.idAgencia + "...");
         Naming.unbind(objName);
+        System.out.println("Desconectado com sucesso!");
+        System.out.println(contextoAtual.idAgencia);
 
         contextoAtual.agenciaAtual = null;
         contextoAtual.idAgencia = null;

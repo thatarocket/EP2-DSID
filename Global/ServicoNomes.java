@@ -55,6 +55,8 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
 
         // localizacao agencia
         public int getAgencia(String idAgencia) throws RemoteException {
+                if (agencias.get(idAgencia) == null)
+                        return 0;
                 return agencias.get(idAgencia);
         }
 
