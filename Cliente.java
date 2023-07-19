@@ -182,7 +182,6 @@ public class Cliente {
         System.out.println("Desconectando da " + contextoAtual.idAgencia + "...");
         Naming.unbind(objName);
         System.out.println("Desconectado com sucesso!");
-        System.out.println(contextoAtual.idAgencia);
 
         contextoAtual.agenciaAtual = null;
         contextoAtual.idAgencia = null;
