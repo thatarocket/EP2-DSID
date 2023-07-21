@@ -32,7 +32,6 @@ public class ServicoNomes extends UnicastRemoteObject implements IServicoNomes {
 
         public String registrarAgente(String idAgencia) throws RemoteException {
                 if (!agencias.containsKey(idAgencia)) {
-                        System.out.println("Agente já cadastrado");
                         return null;
                 }
                 String idAgente = gerarIdAgente();
