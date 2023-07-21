@@ -18,6 +18,7 @@ public class Agente implements IAgente, Serializable, Runnable {
         return (double) soma;
     }
 
+    @Override
     public Double receberMensagem(String msg) {
         mensagem.set(msg);
         return soma(msg);
